@@ -9,7 +9,7 @@ This application uses the [Web Bluetooth API](https://developer.mozilla.org/en-U
 
 ## How to Connect Joy-Con 2
 
-1. **Click the "connect L" or "connect R" button**
+1. **Click the "Connect L" or "Connect R" button**
 
    - A device selection dialog will appear.
 

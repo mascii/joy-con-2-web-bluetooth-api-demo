@@ -98,7 +98,7 @@ const connect = async (type: ControllerType) => {
         <!-- right -->
         <circle cx="150" cy="100" r="20" :class="{ pressed: pressed.L & 4 }" />
       </svg>
-      <button type="button" @click="connect('L')">connect L</button>
+      <button type="button" @click="connect('L')">Connect L</button>
     </div>
 
     <!-- Joy-Con 2 (R) -->
@@ -113,7 +113,7 @@ const connect = async (type: ControllerType) => {
         <!-- A -->
         <circle cx="150" cy="100" r="20" :class="{ pressed: pressed.R & 8 }" />
       </svg>
-      <button type="button" @click="connect('R')">connect R</button>
+      <button type="button" @click="connect('R')">Connect R</button>
     </div>
   </div>
 
