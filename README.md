@@ -18,7 +18,7 @@ This application uses the [Web Bluetooth API](https://developer.mozilla.org/en-U
    - Press the **sync button** on your Joy-Con 2 to put it into sync mode.
 
 3. **Pair the device**
-   - When a device appears in the dialog (it may be displayed as **"DeviceName"**), select it and click the Pair button.
+   - When a device appears in the dialog (it may be displayed as **"Joy-Con 2 (R)"** or **"DeviceName"**), select it and click the Pair button.
 
 ## How to Disconnect
 
