@@ -6,10 +6,10 @@ const CHARACTERISTIC_UUID = "ab7de9be-89fe-49ad-828f-118f09df7fd2";
 
 type ControllerType = "L" | "R";
 
-const controllerIdMap = {
-  L: 0x67,
-  R: 0x66,
-} as const satisfies Record<ControllerType, number>;
+const controllerPidMap = {
+  L: [0x67, 0x20], // little endian
+  R: [0x66, 0x20], // little endian
+} as const satisfies Record<ControllerType, [number, number]>;
 const controllerByteOffsetMap = {
   L: 6,
   R: 4,
@@ -51,9 +51,9 @@ const connect = async (type: ControllerType) => {
                 0x00,
                 0x00,
                 0x00,
-                controllerIdMap[type],
+                ...controllerPidMap[type],
               ]),
-              mask: new Uint8Array([0x00, 0x00, 0x00, 0x00, 0x00, 0xff]),
+              mask: new Uint8Array([0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff]),
             },
           ],
         },
