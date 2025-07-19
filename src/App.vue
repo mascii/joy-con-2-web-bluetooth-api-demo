@@ -95,7 +95,7 @@ const openWithBluefyLink = `bluefy://open?url=${encodeURIComponent(location.href
 </script>
 
 <template>
-  <div v-if="showGuideForUnsupportedBrowsers">
+  <div v-if="showGuideForUnsupportedBrowsers" class="guide">
     <p>Web Bluetooth API is not supported in this browser.</p>
     <p>
       If you are using a macOS device, please use Google Chrome or Microsoft
@@ -115,7 +115,7 @@ const openWithBluefyLink = `bluefy://open?url=${encodeURIComponent(location.href
   <div v-else class="app">
     <!-- Joy-Con 2 (L) -->
     <div class="unit">
-      <svg width="200" height="200" viewBox="0 0 200 200">
+      <svg width="175" height="175" viewBox="10 10 180 180">
         <!-- up -->
         <circle cx="100" cy="50" r="20" :class="{ pressed: pressed.L & 2 }" />
         <!-- down -->
@@ -130,7 +130,7 @@ const openWithBluefyLink = `bluefy://open?url=${encodeURIComponent(location.href
 
     <!-- Joy-Con 2 (R) -->
     <div class="unit">
-      <svg width="200" height="200" viewBox="0 0 200 200">
+      <svg width="175" height="175" viewBox="10 10 180 180">
         <!-- X -->
         <circle cx="100" cy="50" r="20" :class="{ pressed: pressed.R & 2 }" />
         <!-- B -->
@@ -150,6 +150,10 @@ const openWithBluefyLink = `bluefy://open?url=${encodeURIComponent(location.href
 </template>
 
 <style scoped>
+.guide {
+  padding: 0 2rem;
+}
+
 .app {
   display: flex;
   flex-direction: row;
@@ -165,6 +169,8 @@ const openWithBluefyLink = `bluefy://open?url=${encodeURIComponent(location.href
 
 .error {
   margin-top: 20px;
+  padding: 0 2rem;
+  text-align: center;
 }
 
 .app svg circle {
