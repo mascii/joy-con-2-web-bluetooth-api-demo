@@ -31,6 +31,7 @@ const errorMessage = computed((): string | null => {
   return null;
 });
 
+const isBluefy = navigator.userAgent.includes("Bluefy");
 const connect = async (type: ControllerType) => {
   try {
     if (!navigator.bluetooth) {
@@ -41,22 +42,28 @@ const connect = async (type: ControllerType) => {
 
     const device = await navigator.bluetooth.requestDevice({
       filters: [
-        {
-          manufacturerData: [
-            {
-              companyIdentifier: 0x0553, // https://www.bluetooth.com/wp-content/uploads/Files/Specification/Assigned_Numbers.pdf
-              dataPrefix: new Uint8Array([
-                0x00,
-                0x00,
-                0x00,
-                0x00,
-                0x00,
-                ...controllerPidMap[type],
-              ]),
-              mask: new Uint8Array([0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff]),
+        isBluefy
+          ? {
+              name: `Joy-Con 2 (${type})`,
+            }
+          : {
+              manufacturerData: [
+                {
+                  companyIdentifier: 0x0553, // https://www.bluetooth.com/wp-content/uploads/Files/Specification/Assigned_Numbers.pdf
+                  dataPrefix: new Uint8Array([
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    0x00,
+                    ...controllerPidMap[type],
+                  ]),
+                  mask: new Uint8Array([
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff,
+                  ]),
+                },
+              ],
             },
-          ],
-        },
       ],
       optionalServices: [SERVICE_UUID],
     });
