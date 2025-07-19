@@ -89,10 +89,30 @@ const connect = async (type: ControllerType) => {
     console.error("Error connecting:", error);
   }
 };
+
+const showGuideForUnsupportedBrowsers = !navigator.bluetooth;
+const openWithBluefyLink = `bluefy://open?url=${encodeURIComponent(location.href)}`;
 </script>
 
 <template>
-  <div class="app">
+  <div v-if="showGuideForUnsupportedBrowsers">
+    <p>Web Bluetooth API is not supported in this browser.</p>
+    <p>
+      If you are using a macOS device, please use Google Chrome or Microsoft
+      Edge.
+    </p>
+    <p>
+      If you are using an iOS or iPadOS device, please install the
+      <a
+        href="https://apps.apple.com/jp/app/bluefy-web-ble-browser/id1492822055"
+        >Bluefy</a
+      >
+      app from the App Store and
+      <a :href="openWithBluefyLink">open this page with Bluefy</a>.
+    </p>
+  </div>
+
+  <div v-else class="app">
     <!-- Joy-Con 2 (L) -->
     <div class="unit">
       <svg width="200" height="200" viewBox="0 0 200 200">
