@@ -6,6 +6,7 @@ This application uses the [Web Bluetooth API](https://developer.mozilla.org/en-U
 
 - Google Chrome
 - Microsoft Edge
+- [Bluefy - Web BLE Browser](https://apps.apple.com/jp/app/bluefy-web-ble-browser/id1492822055) (for iOS and iPadOS)
 
 ## How to Connect Joy-Con 2
 
