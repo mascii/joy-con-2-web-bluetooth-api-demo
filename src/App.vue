@@ -40,33 +40,42 @@ const connect = async (type: ControllerType) => {
       );
     }
 
-    const device = await navigator.bluetooth.requestDevice({
-      filters: [
-        isBluefy
-          ? {
-              name: `Joy-Con 2 (${type})`,
-            }
-          : {
-              manufacturerData: [
-                {
-                  companyIdentifier: 0x0553, // https://www.bluetooth.com/wp-content/uploads/Files/Specification/Assigned_Numbers.pdf
-                  dataPrefix: new Uint8Array([
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                    ...controllerPidMap[type],
-                  ]),
-                  mask: new Uint8Array([
-                    0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff,
-                  ]),
-                },
-              ],
-            },
-      ],
-      optionalServices: [SERVICE_UUID],
-    });
+    const device = await navigator.bluetooth
+      .requestDevice({
+        filters: [
+          isBluefy
+            ? {
+                name: `Joy-Con 2 (${type})`,
+              }
+            : {
+                manufacturerData: [
+                  {
+                    companyIdentifier: 0x0553, // https://www.bluetooth.com/wp-content/uploads/Files/Specification/Assigned_Numbers.pdf
+                    dataPrefix: new Uint8Array([
+                      0x00,
+                      0x00,
+                      0x00,
+                      0x00,
+                      0x00,
+                      ...controllerPidMap[type],
+                    ]),
+                    mask: new Uint8Array([
+                      0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff,
+                    ]),
+                  },
+                ],
+              },
+        ],
+        optionalServices: [SERVICE_UUID],
+      })
+      .catch((error) => {
+        if (isBluefy && error === 2) {
+          throw new Error(
+            "User cancelled the requestDevice() chooser in Bluefy app.",
+          );
+        }
+        throw error;
+      });
 
     if (!device.gatt) {
       throw new Error("Device does not support GATT");
