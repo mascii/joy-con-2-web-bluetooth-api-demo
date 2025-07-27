@@ -2,9 +2,13 @@
 import { computed, reactive, shallowRef } from "vue";
 
 import DirectionalPad from "./DirectionalPad.vue";
+import MouseCrosshair from "./MouseCrosshair.vue";
 
 const SERVICE_UUID = "ab7de9be-89fe-49ad-828f-118f09df7fd0";
 const INPUT_REPORT_CHARACTERISTIC_UUID = "ab7de9be-89fe-49ad-828f-118f09df7fd2";
+const WRITE_COMMAND_CHARACTERISTIC_UUID = "649d4ac9-8eb7-4e6c-af44-1ea54fe5f005";
+const POSITION_WRAPAROUND_THRESHOLD = 15000;
+const MOUSE_DISPLAY_SCALE = 20;
 
 type ControllerType = "L" | "R";
 
@@ -16,6 +20,24 @@ const controllerByteOffsetMap = {
   L: 6,
   R: 4,
 } as const satisfies Record<ControllerType, number>;
+
+const createMouseState = () => {
+  return reactive({
+    rawPosition: {
+      x: 0,
+      y: 0,
+    },
+    accumulatedPosition: {
+      x: 0,
+      y: 0,
+    },
+  });
+};
+
+const mouseState = {
+  L: createMouseState(),
+  R: createMouseState(),
+} as const satisfies Record<ControllerType, ReturnType<typeof createMouseState>>;
 
 const pressed = reactive({
   L: 0,
@@ -32,6 +54,43 @@ const errorMessage = computed((): string | null => {
   }
   return null;
 });
+
+const calculateDeltaWithWraparound = (
+  current: number,
+  previous: number,
+): number => {
+  let delta = current - previous;
+  if (delta > POSITION_WRAPAROUND_THRESHOLD) {
+    delta -= 65536;
+  } else if (delta < -POSITION_WRAPAROUND_THRESHOLD) {
+    delta += 65536;
+  }
+  return delta;
+};
+
+const processMouseInputReport = (dataView: DataView, type: ControllerType) => {
+  const currentRawX = dataView.getUint16(16, true);
+  const currentRawY = dataView.getUint16(18, true);
+
+  const deltaX = calculateDeltaWithWraparound(
+    currentRawX,
+    mouseState[type].rawPosition.x,
+  );
+  const deltaY = calculateDeltaWithWraparound(
+    currentRawY,
+    mouseState[type].rawPosition.y,
+  );
+
+  mouseState[type].rawPosition.x = currentRawX;
+  mouseState[type].rawPosition.y = currentRawY;
+
+  mouseState[type].accumulatedPosition.x += deltaX;
+  mouseState[type].accumulatedPosition.y += deltaY;
+};
+
+const sleep = (ms: number) => {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms));
+};
 
 const isBluefy = navigator.userAgent.includes("Bluefy");
 const connect = async (type: ControllerType) => {
@@ -85,6 +144,21 @@ const connect = async (type: ControllerType) => {
 
     const server = await device.gatt.connect();
     const service = await server.getPrimaryService(SERVICE_UUID);
+    const characteristicWrite = await service.getCharacteristic(
+      WRITE_COMMAND_CHARACTERISTIC_UUID,
+    );
+    await characteristicWrite.writeValueWithoutResponse(
+      new Uint8Array([
+        0x0c, 0x91, 0x01, 0x02, 0x00, 0x04, 0x00, 0x00, 0xff, 0x00, 0x00, 0x00,
+      ]),
+    );
+    await sleep(500);
+    await characteristicWrite.writeValueWithoutResponse(
+      new Uint8Array([
+        0x0c, 0x91, 0x01, 0x04, 0x00, 0x04, 0x00, 0x00, 0xff, 0x00, 0x00, 0x00,
+      ]),
+    );
+
     const characteristic = await service.getCharacteristic(
       INPUT_REPORT_CHARACTERISTIC_UUID,
     );
@@ -92,8 +166,9 @@ const connect = async (type: ControllerType) => {
     characteristic.addEventListener(
       "characteristicvaluechanged",
       (event: any) => {
-        const value = event.target.value as DataView;
-        pressed[type] = value.getUint8(controllerByteOffsetMap[type]);
+        const dataView = event.target.value as DataView;
+        processMouseInputReport(dataView, type);
+        pressed[type] = dataView.getUint8(controllerByteOffsetMap[type]);
       },
     );
     errorRef.value = null;
@@ -127,6 +202,12 @@ const openWithBluefyLink = `bluefy://open?url=${encodeURIComponent(location.href
 
   <div v-else class="app">
     <!-- Joy-Con 2 (L) -->
+    <MouseCrosshair
+      color="#0ab9e6"
+      :x="mouseState.L.accumulatedPosition.x"
+      :y="mouseState.L.accumulatedPosition.y"
+      :scale="MOUSE_DISPLAY_SCALE"
+    />
     <div class="unit">
       <DirectionalPad
         :up="pressed.L & 2"
@@ -138,6 +219,12 @@ const openWithBluefyLink = `bluefy://open?url=${encodeURIComponent(location.href
     </div>
 
     <!-- Joy-Con 2 (R) -->
+    <MouseCrosshair
+      color="#ff3c28"
+      :x="mouseState.R.accumulatedPosition.x"
+      :y="mouseState.R.accumulatedPosition.y"
+      :scale="MOUSE_DISPLAY_SCALE"
+    />
     <div class="unit">
       <DirectionalPad
         :up="pressed.R & 2"
