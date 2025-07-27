@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive, shallowRef } from "vue";
 
+import DirectionalPad from "./DirectionalPad.vue";
+
 const SERVICE_UUID = "ab7de9be-89fe-49ad-828f-118f09df7fd0";
 const INPUT_REPORT_CHARACTERISTIC_UUID = "ab7de9be-89fe-49ad-828f-118f09df7fd2";
 
@@ -126,31 +128,23 @@ const openWithBluefyLink = `bluefy://open?url=${encodeURIComponent(location.href
   <div v-else class="app">
     <!-- Joy-Con 2 (L) -->
     <div class="unit">
-      <svg width="175" height="175" viewBox="10 10 180 180">
-        <!-- up -->
-        <circle cx="100" cy="50" r="20" :class="{ pressed: pressed.L & 2 }" />
-        <!-- down -->
-        <circle cx="100" cy="150" r="20" :class="{ pressed: pressed.L & 1 }" />
-        <!-- left -->
-        <circle cx="50" cy="100" r="20" :class="{ pressed: pressed.L & 8 }" />
-        <!-- right -->
-        <circle cx="150" cy="100" r="20" :class="{ pressed: pressed.L & 4 }" />
-      </svg>
+      <DirectionalPad
+        :up="pressed.L & 2"
+        :down="pressed.L & 1"
+        :left="pressed.L & 8"
+        :right="pressed.L & 4"
+      />
       <button type="button" @click="connect('L')">Connect L</button>
     </div>
 
     <!-- Joy-Con 2 (R) -->
     <div class="unit">
-      <svg width="175" height="175" viewBox="10 10 180 180">
-        <!-- X -->
-        <circle cx="100" cy="50" r="20" :class="{ pressed: pressed.R & 2 }" />
-        <!-- B -->
-        <circle cx="100" cy="150" r="20" :class="{ pressed: pressed.R & 4 }" />
-        <!-- Y -->
-        <circle cx="50" cy="100" r="20" :class="{ pressed: pressed.R & 1 }" />
-        <!-- A -->
-        <circle cx="150" cy="100" r="20" :class="{ pressed: pressed.R & 8 }" />
-      </svg>
+      <DirectionalPad
+        :up="pressed.R & 2"
+        :down="pressed.R & 4"
+        :left="pressed.R & 1"
+        :right="pressed.R & 8"
+      />
       <button type="button" @click="connect('R')">Connect R</button>
     </div>
   </div>
@@ -182,12 +176,5 @@ const openWithBluefyLink = `bluefy://open?url=${encodeURIComponent(location.href
   margin-top: 20px;
   padding: 0 2rem;
   text-align: center;
-}
-
-.app svg circle {
-  fill: #666;
-}
-.app svg circle.pressed {
-  fill: #fff;
 }
 </style>
