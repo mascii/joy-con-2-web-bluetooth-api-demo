@@ -2,7 +2,7 @@
 import { computed, reactive, shallowRef } from "vue";
 
 const SERVICE_UUID = "ab7de9be-89fe-49ad-828f-118f09df7fd0";
-const CHARACTERISTIC_UUID = "ab7de9be-89fe-49ad-828f-118f09df7fd2";
+const INPUT_REPORT_CHARACTERISTIC_UUID = "ab7de9be-89fe-49ad-828f-118f09df7fd2";
 
 type ControllerType = "L" | "R";
 
@@ -83,7 +83,9 @@ const connect = async (type: ControllerType) => {
 
     const server = await device.gatt.connect();
     const service = await server.getPrimaryService(SERVICE_UUID);
-    const characteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
+    const characteristic = await service.getCharacteristic(
+      INPUT_REPORT_CHARACTERISTIC_UUID,
+    );
     await characteristic.startNotifications();
     characteristic.addEventListener(
       "characteristicvaluechanged",
