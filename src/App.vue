@@ -3,6 +3,7 @@ import { computed, reactive, shallowRef } from "vue";
 
 import DirectionalPad from "./DirectionalPad.vue";
 import MouseCrosshair from "./MouseCrosshair.vue";
+import { generateLEDPattern } from "./generateLEDPattern";
 
 const SERVICE_UUID = "ab7de9be-89fe-49ad-828f-118f09df7fd0";
 const INPUT_REPORT_CHARACTERISTIC_UUID = "ab7de9be-89fe-49ad-828f-118f09df7fd2";
@@ -93,6 +94,7 @@ const sleep = (ms: number) => {
 };
 
 const isBluefy = navigator.userAgent.includes("Bluefy");
+const ledPatternGenerator = generateLEDPattern();
 const connect = async (type: ControllerType) => {
   try {
     if (!navigator.bluetooth) {
@@ -147,6 +149,27 @@ const connect = async (type: ControllerType) => {
     const characteristicWrite = await service.getCharacteristic(
       WRITE_COMMAND_CHARACTERISTIC_UUID,
     );
+    await characteristicWrite.writeValueWithoutResponse(
+      new Uint8Array([
+        0x09,
+        0x91,
+        0x01,
+        0x07,
+        0x00,
+        0x08,
+        0x00,
+        0x00,
+        ledPatternGenerator.next().value,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+      ]),
+    );
+    await sleep(500);
     await characteristicWrite.writeValueWithoutResponse(
       new Uint8Array([
         0x0c, 0x91, 0x01, 0x02, 0x00, 0x04, 0x00, 0x00, 0xff, 0x00, 0x00, 0x00,
