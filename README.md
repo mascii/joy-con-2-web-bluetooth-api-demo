@@ -25,3 +25,10 @@ This application uses the [Web Bluetooth API](https://developer.mozilla.org/en-U
 ## How to Disconnect
 
 Reloading the page will disconnect all paired controllers.
+
+## Special Thanks
+
+The following repositories were used for reference:
+
+- https://github.com/TheFrano/joycon2cpp
+- https://github.com/moutella/joycon2mouse
