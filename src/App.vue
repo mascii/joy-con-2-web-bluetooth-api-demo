@@ -215,8 +215,7 @@ const openWithBluefyLink = `bluefy://open?url=${encodeURIComponent(location.href
     </p>
     <p>
       If you are using an iOS or iPadOS device, please install the
-      <a
-        href="https://apps.apple.com/jp/app/bluefy-web-ble-browser/id1492822055"
+      <a href="https://apps.apple.com/jp/app/bluefy-web-ble-browser/id1492822055"
         >Bluefy</a
       >
       app from the App Store and
