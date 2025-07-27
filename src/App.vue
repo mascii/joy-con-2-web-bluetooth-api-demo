@@ -23,7 +23,7 @@ const controllerByteOffsetMap = {
 } as const satisfies Record<ControllerType, number>;
 
 const createMouseState = () => {
-  return reactive({
+  return {
     rawPosition: {
       x: 0,
       y: 0,
@@ -32,13 +32,13 @@ const createMouseState = () => {
       x: 0,
       y: 0,
     },
-  });
+  };
 };
 
-const mouseState = {
+const mouseState = reactive({
   L: createMouseState(),
   R: createMouseState(),
-} as const satisfies Record<ControllerType, ReturnType<typeof createMouseState>>;
+}) satisfies Record<ControllerType, ReturnType<typeof createMouseState>>;
 
 const pressed = reactive({
   L: 0,
@@ -186,6 +186,7 @@ const connect = async (type: ControllerType) => {
       INPUT_REPORT_CHARACTERISTIC_UUID,
     );
     await characteristic.startNotifications();
+    mouseState[type] = createMouseState();
     characteristic.addEventListener(
       "characteristicvaluechanged",
       (event: any) => {
