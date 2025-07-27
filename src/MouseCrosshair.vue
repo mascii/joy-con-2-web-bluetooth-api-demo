@@ -37,7 +37,6 @@ const props = defineProps<{
 <style scoped>
 .crosshair {
   position: fixed;
-  pointer-events: none;
   z-index: 1000;
 }
 .line {
@@ -52,10 +51,5 @@ const props = defineProps<{
   width: 100vw;
   height: 1px;
   left: 0;
-}
-.content {
-  padding: 20px;
-  text-align: center;
-  margin-top: 50px;
 }
 </style>
