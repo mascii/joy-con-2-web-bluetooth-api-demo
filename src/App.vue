@@ -8,7 +8,8 @@ import { generateLEDPattern } from "./generateLEDPattern";
 const SERVICE_UUID = "ab7de9be-89fe-49ad-828f-118f09df7fd0";
 const INPUT_REPORT_CHARACTERISTIC_UUID = "ab7de9be-89fe-49ad-828f-118f09df7fd2";
 const WRITE_COMMAND_CHARACTERISTIC_UUID = "649d4ac9-8eb7-4e6c-af44-1ea54fe5f005";
-const POSITION_WRAPAROUND_THRESHOLD = 15000;
+const MOUSE_COORDINATE_MAX = 65536;
+const MOUSE_POSITION_WRAPAROUND_THRESHOLD = 15000;
 const MOUSE_DISPLAY_SCALE = 20;
 
 type ControllerType = "L" | "R";
@@ -61,10 +62,10 @@ const calculateDeltaWithWraparound = (
   previous: number,
 ): number => {
   let delta = current - previous;
-  if (delta > POSITION_WRAPAROUND_THRESHOLD) {
-    delta -= 65536;
-  } else if (delta < -POSITION_WRAPAROUND_THRESHOLD) {
-    delta += 65536;
+  if (delta > MOUSE_POSITION_WRAPAROUND_THRESHOLD) {
+    delta -= MOUSE_COORDINATE_MAX;
+  } else if (delta < -MOUSE_POSITION_WRAPAROUND_THRESHOLD) {
+    delta += MOUSE_COORDINATE_MAX;
   }
   return delta;
 };
