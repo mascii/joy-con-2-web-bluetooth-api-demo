@@ -97,12 +97,6 @@ const isBluefy = navigator.userAgent.includes("Bluefy");
 const ledPatternGenerator = generateLEDPattern();
 const connect = async (type: ControllerType) => {
   try {
-    if (!navigator.bluetooth) {
-      throw new Error(
-        "Web Bluetooth API is not supported in this browser. Please use Google Chrome or Microsoft Edge.",
-      );
-    }
-
     const device = await navigator.bluetooth
       .requestDevice({
         filters: [
