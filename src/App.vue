@@ -133,7 +133,7 @@ const connect = async (type: ControllerType) => {
       .catch((error) => {
         if (isBluefy && error === 2) {
           throw new Error(
-            "User cancelled the requestDevice() chooser in Bluefy app.",
+            "Connection failed. This may occur if Bluetooth is disabled or if the requestDevice() chooser was cancelled.",
           );
         }
         throw error;
