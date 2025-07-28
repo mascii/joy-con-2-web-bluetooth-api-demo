@@ -9,7 +9,7 @@ const SERVICE_UUID = "ab7de9be-89fe-49ad-828f-118f09df7fd0";
 const INPUT_REPORT_CHARACTERISTIC_UUID = "ab7de9be-89fe-49ad-828f-118f09df7fd2";
 const WRITE_COMMAND_CHARACTERISTIC_UUID = "649d4ac9-8eb7-4e6c-af44-1ea54fe5f005";
 const MOUSE_COORDINATE_MAX = 65536;
-const MOUSE_POSITION_WRAPAROUND_THRESHOLD = 15000;
+const MOUSE_COORDINATE_HALF_RANGE = MOUSE_COORDINATE_MAX / 2;
 const MOUSE_DISPLAY_SCALE = 20;
 
 type ControllerType = "L" | "R";
@@ -57,28 +57,28 @@ const errorMessage = computed((): string | null => {
   return null;
 });
 
-const calculateDeltaWithWraparound = (
-  current: number,
-  previous: number,
-): number => {
-  let delta = current - previous;
-  if (delta > MOUSE_POSITION_WRAPAROUND_THRESHOLD) {
-    delta -= MOUSE_COORDINATE_MAX;
-  } else if (delta < -MOUSE_POSITION_WRAPAROUND_THRESHOLD) {
-    delta += MOUSE_COORDINATE_MAX;
+const calculateMouseDelta = (current: number, previous: number): number => {
+  const rawDelta = current - previous;
+
+  if (rawDelta > MOUSE_COORDINATE_HALF_RANGE) {
+    return rawDelta - MOUSE_COORDINATE_MAX;
   }
-  return delta;
+  if (rawDelta < -MOUSE_COORDINATE_HALF_RANGE) {
+    return rawDelta + MOUSE_COORDINATE_MAX;
+  }
+
+  return rawDelta;
 };
 
 const processMouseInputReport = (dataView: DataView, type: ControllerType) => {
   const currentRawX = dataView.getUint16(16, true);
   const currentRawY = dataView.getUint16(18, true);
 
-  const deltaX = calculateDeltaWithWraparound(
+  const deltaX = calculateMouseDelta(
     currentRawX,
     mouseState[type].rawPosition.x,
   );
-  const deltaY = calculateDeltaWithWraparound(
+  const deltaY = calculateMouseDelta(
     currentRawY,
     mouseState[type].rawPosition.y,
   );
