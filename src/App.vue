@@ -89,6 +89,10 @@ const processMouseInputReport = (dataView: DataView, type: ControllerType) => {
   mouseState[type].accumulatedPosition.y += deltaY;
 };
 
+const processButtonInputReport = (dataView: DataView, type: ControllerType) => {
+  pressed[type] = dataView.getUint8(controllerByteOffsetMap[type]);
+};
+
 const sleep = (ms: number) => {
   return new Promise<void>((resolve) => setTimeout(resolve, ms));
 };
@@ -186,7 +190,7 @@ const connect = async (type: ControllerType) => {
       (event: any) => {
         const dataView = event.target.value as DataView;
         processMouseInputReport(dataView, type);
-        pressed[type] = dataView.getUint8(controllerByteOffsetMap[type]);
+        processButtonInputReport(dataView, type);
       },
     );
     errorRef.value = null;
